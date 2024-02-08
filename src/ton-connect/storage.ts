@@ -27,3 +27,15 @@ export class TonConnectStorage implements IStorage {
         return (await client.get(this.getKey(key))) || null;
     }
 }
+
+const storages = new Map<number, TonConnectStorage>;
+
+export const getStorage = (chatId: number): TonConnectStorage => {
+    if (storages.has(chatId)) {
+        return storages.get(chatId)!;
+    }
+
+    storages.set(chatId, new TonConnectStorage(chatId));
+
+    return storages.get(chatId)!;
+}

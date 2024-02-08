@@ -21,6 +21,7 @@ module.exports = {
                 'prettier'
             ],
             rules: {
+                'prettier/prettier': 0,
                 'import/extensions': [
                     'error',
                     'ignorePackages',
@@ -92,7 +93,7 @@ module.exports = {
                 ],
                 'import/export': 0,
                 '@typescript-eslint/no-shadow': 'off',
-                '@typescript-eslint/return-await': 'off'
+                '@typescript-eslint/return-await': 'off',
             }
         },
         {

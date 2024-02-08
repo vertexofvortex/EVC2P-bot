@@ -54,11 +54,11 @@ export async function buildUniversalKeyboard(
 
     const keyboard = [
         {
-            text: 'Choose a Wallet',
+            text: 'Выбрать кошелёк',
             callback_data: JSON.stringify({ method: 'chose_wallet' })
         },
         {
-            text: 'Open Link',
+            text: 'Открыть ссылку',
             url: `https://ton-connect.github.io/open-tc?connect=${encodeURIComponent(link)}`
         }
     ];
@@ -72,3 +72,4 @@ export async function buildUniversalKeyboard(
 
     return keyboard;
 }
+    

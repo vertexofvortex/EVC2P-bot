@@ -5,6 +5,7 @@ import QRCode from 'qrcode';
 import TelegramBot from 'node-telegram-bot-api';
 import { getConnector } from './ton-connect/connector';
 import { addTGReturnStrategy, buildUniversalKeyboard, pTimeout, pTimeoutException } from './utils';
+import { getStorage } from './ton-connect/storage';
 
 let newConnectRequestListenersMap = new Map<number, () => void>();
 
@@ -27,12 +28,11 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
             connector.wallet!.device.appName;
         await bot.sendMessage(
             chatId,
-            `You have already connect ${connectedName} wallet\nYour address: ${toUserFriendlyAddress(
+            `Кошелёк ${connectedName} уже подключен. \nЕго адрес: ${toUserFriendlyAddress(
                 connector.wallet!.account.address,
                 connector.wallet!.account.chain === CHAIN.TESTNET
-            )}\n\n Disconnect wallet firstly to connect a new one`
+            )}\n\nСначала отключите его при помощи команды /disconnect, чтобы добавить новый`
         );
-
         return;
     }
 
@@ -42,7 +42,16 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
 
             const walletName =
                 (await getWalletInfo(wallet.device.appName))?.name || wallet.device.appName;
-            await bot.sendMessage(chatId, `${walletName} wallet connected successfully`);
+            const walletAddress = toUserFriendlyAddress(
+                connector.wallet!.account.address,
+                connector.wallet!.account.chain === CHAIN.TESTNET
+            )
+            const code = await getStorage(chatId).getItem("code");
+            
+            await bot.sendMessage(chatId, `Кошелёк ${walletName} успешно подключён. Используйте команду /my_wallet, чтобы посмотреть его адрес`);
+            
+            console.log("подключен", walletAddress, code);
+
             unsubscribe();
             newConnectRequestListenersMap.delete(chatId);
         }
@@ -157,13 +166,13 @@ export async function handleDisconnectCommand(msg: TelegramBot.Message): Promise
 
     await connector.restoreConnection();
     if (!connector.connected) {
-        await bot.sendMessage(chatId, "You didn't connect a wallet");
+        await bot.sendMessage(chatId, "Вы ещё не подключали кошелёк");
         return;
     }
 
     await connector.disconnect();
 
-    await bot.sendMessage(chatId, 'Wallet has been disconnected');
+    await bot.sendMessage(chatId, 'Кошелёк успешно отвязан');
 }
 
 export async function handleShowMyWalletCommand(msg: TelegramBot.Message): Promise<void> {
@@ -173,7 +182,7 @@ export async function handleShowMyWalletCommand(msg: TelegramBot.Message): Promi
 
     await connector.restoreConnection();
     if (!connector.connected) {
-        await bot.sendMessage(chatId, "You didn't connect a wallet");
+        await bot.sendMessage(chatId, "Вы ещё не подключали кошелёк");
         return;
     }
 
@@ -183,7 +192,7 @@ export async function handleShowMyWalletCommand(msg: TelegramBot.Message): Promi
 
     await bot.sendMessage(
         chatId,
-        `Connected wallet: ${walletName}\nYour address: ${toUserFriendlyAddress(
+        `Подключённый кошелёк: ${walletName}\nЕго адрес: ${toUserFriendlyAddress(
             connector.wallet!.account.address,
             connector.wallet!.account.chain === CHAIN.TESTNET
         )}`

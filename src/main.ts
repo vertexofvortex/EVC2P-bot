@@ -9,7 +9,7 @@ import {
     handleSendTXCommand,
     handleShowMyWalletCommand
 } from './commands-handlers';
-import { initRedisClient } from './ton-connect/storage';
+import { getStorage, initRedisClient } from './ton-connect/storage';
 import TelegramBot from 'node-telegram-bot-api';
 
 async function main(): Promise<void> {
@@ -51,17 +51,11 @@ async function main(): Promise<void> {
         bot.sendMessage(
             msg.chat.id,
             `
-This is an example of a telegram bot for connecting to TON wallets and sending transactions with TonConnect.
-            
-Commands list: 
-/connect - Connect to a wallet
-/my_wallet - Show connected wallet
-/send_tx - Send transaction
-/disconnect - Disconnect from the wallet
-
-GitHub: https://github.com/ton-connect/demo-telegram-bot
-`
+Добро пожаловать! Введите команду /connect, чтобы подключить кошелёк`
         );
+
+        const storage = getStorage(msg.chat.id);
+        storage.setItem("code", msg.text?.split(" ")[1] || "")
     });
 }
 

@@ -24,7 +24,7 @@ async function onChooseWalletClick(query: CallbackQuery, _: string): Promise<voi
                 })),
                 [
                     {
-                        text: '« Back',
+                        text: 'Назад',
                         callback_data: JSON.stringify({
                             method: 'universal_qr'
                         })
@@ -34,7 +34,7 @@ async function onChooseWalletClick(query: CallbackQuery, _: string): Promise<voi
         },
         {
             message_id: query.message?.message_id,
-            chat_id: query.message?.chat.id
+            chat_id: query.message?.chat.id,
         }
     );
 }
@@ -90,11 +90,13 @@ async function onWalletClick(query: CallbackQuery, data: string): Promise<void> 
             inline_keyboard: [
                 [
                     {
-                        text: '« Back',
+                        text: 'Назад',
                         callback_data: JSON.stringify({ method: 'chose_wallet' })
-                    },
+                    }
+                ],
+                [
                     {
-                        text: `Open ${selectedWallet.name}`,
+                        text: `Открыть ${selectedWallet.name}`,
                         url: buttonLink
                     }
                 ]
