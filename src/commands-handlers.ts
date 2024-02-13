@@ -61,11 +61,11 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
     const wallets = await getWallets();
 
     const link = connector.connect(wallets);
-    const image = await QRCode.toBuffer(link);
+    // const image = await QRCode.toBuffer(link);
 
     const keyboard = await buildUniversalKeyboard(link, wallets);
 
-    const botMessage = await bot.sendPhoto(chatId, image, {
+    const botMessage = await bot.sendPhoto(chatId, "Нажмите на кнопку под этим сообщением, чтобы создать криптокошелёк или подключить существующий", {
         reply_markup: {
             inline_keyboard: [keyboard]
         }
