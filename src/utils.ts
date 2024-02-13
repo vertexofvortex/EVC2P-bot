@@ -53,14 +53,14 @@ export async function buildUniversalKeyboard(
         : undefined;
 
     const keyboard = [
-        {
-            text: 'Выбрать кошелёк',
-            callback_data: JSON.stringify({ method: 'chose_wallet' })
-        },
-        {
-            text: 'Открыть ссылку',
-            url: `https://ton-connect.github.io/open-tc?connect=${encodeURIComponent(link)}`
-        }
+        // {
+        //     text: 'Выбрать кошелёк',
+        //     callback_data: JSON.stringify({ method: 'chose_wallet' })
+        // },
+        // {
+        //     text: 'Открыть ссылку',
+        //     url: `https://ton-connect.github.io/open-tc?connect=${encodeURIComponent(link)}`
+        // }
     ];
 
     if (atWalletLink) {

@@ -45,7 +45,7 @@ async function main(): Promise<void> {
     bot.onText(/\/send_wallet/, handleSendWalletCommand);
     bot.onText(/Отправить ещё раз/, handleSendWalletCommand)
 
-    bot.onText(/\/send_tx/, handleSendTXCommand);
+    // bot.onText(/\/send_tx/, handleSendTXCommand);
 
     bot.onText(/\/disconnect/, handleDisconnectCommand);
 
@@ -55,7 +55,7 @@ async function main(): Promise<void> {
         bot.sendMessage(
             msg.chat.id,
             `
-Добро пожаловать! Введите команду /connect, чтобы подключить кошелёк`
+Добро пожаловать! Этот бот поможет Вам получить сертификат участника конференции. Введите команду /connect, чтобы начать.`
         );
 
         const storage = getStorage(msg.chat.id);

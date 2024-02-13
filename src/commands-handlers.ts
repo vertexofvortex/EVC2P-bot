@@ -32,7 +32,7 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
             `Кошелёк ${connectedName} уже подключен. \nЕго адрес: ${toUserFriendlyAddress(
                 connector.wallet!.account.address,
                 connector.wallet!.account.chain === CHAIN.TESTNET
-            )}\n\nСначала отключите его при помощи команды /disconnect, чтобы добавить новый`
+            )}\n\nЧтобы добавить новый, сначала отключите существующий при помощи команды /disconnect`
         );
         return;
     }
@@ -50,7 +50,7 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
             // const code = await getStorage(chatId).getItem("code");
             await getStorage(chatId).setItem("walletAddress", walletAddress)
 
-            await bot.sendMessage(chatId, `Кошелёк ${walletName} успешно подключён. Используйте команду /my_wallet, чтобы посмотреть его адрес`);
+            await bot.sendMessage(chatId, `Кошелёк ${walletName} успешно подключен. Используйте команду /my_wallet, чтобы посмотреть его адрес`);
             await handleSendWalletCommand(msg);
 
             unsubscribe();
@@ -105,11 +105,11 @@ export async function handleSendWalletCommand(msg: TelegramBot.Message): Promise
         })
         .catch(async (error) => {
             if (error.response.status === 401) {
-                await bot.sendMessage(chatId, `Этот адрес или код уже были использованы. Попробуйте воспользоваться другим`);
+                await bot.sendMessage(chatId, `Этот адрес или код уже были использованы. Обратитесь за помощью к организаторам.`);
             }
 
             if (error.response.status === 500) {
-                await bot.sendMessage(chatId, `Произошла неизвестная ошибка при отправке адреса кошелька. Попробуйте отправить его чуть позже`, {
+                await bot.sendMessage(chatId, `Произошла неизвестная ошибка при отправке адреса кошелька. Нажмите на кнопку ниже, чтобы повторить попытку.`, {
                     reply_markup: {
                         keyboard: [
                             [
