@@ -6,7 +6,6 @@ import { walletMenuCallbacks } from './connect-wallet-menu';
 import {
     handleConnectCommand,
     handleDisconnectCommand,
-    handleSendTXCommand,
     handleSendWalletCommand,
     handleShowMyWalletCommand
 } from './commands-handlers';

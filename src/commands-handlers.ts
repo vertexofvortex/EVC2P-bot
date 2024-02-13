@@ -1,12 +1,12 @@
 import { CHAIN, isTelegramUrl, toUserFriendlyAddress, UserRejectsError } from '@tonconnect/sdk';
 import { bot } from './bot';
 import { getWallets, getWalletInfo } from './ton-connect/wallets';
-import QRCode from 'qrcode';
 import TelegramBot from 'node-telegram-bot-api';
 import { getConnector } from './ton-connect/connector';
 import { addTGReturnStrategy, buildUniversalKeyboard, pTimeout, pTimeoutException } from './utils';
 import { getStorage } from './ton-connect/storage';
 import axios from 'axios';
+// import QRCode from 'qrcode';
 
 let newConnectRequestListenersMap = new Map<number, () => void>();
 
@@ -65,7 +65,7 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
 
     const keyboard = await buildUniversalKeyboard(link, wallets);
 
-    const botMessage = await bot.sendPhoto(chatId, "Нажмите на кнопку под этим сообщением, чтобы создать криптокошелёк или подключить существующий", {
+    const botMessage = await bot.sendMessage(chatId,"Нажмите на кнопку под этим сообщением, чтобы создать криптокошелёк или подключить существующий", {
         reply_markup: {
             inline_keyboard: [keyboard]
         }
