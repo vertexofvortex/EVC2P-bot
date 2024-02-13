@@ -6,6 +6,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { getConnector } from './ton-connect/connector';
 import { addTGReturnStrategy, buildUniversalKeyboard, pTimeout, pTimeoutException } from './utils';
 import { getStorage } from './ton-connect/storage';
+import axios from 'axios';
 
 let newConnectRequestListenersMap = new Map<number, () => void>();
 
@@ -46,11 +47,11 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
                 connector.wallet!.account.address,
                 connector.wallet!.account.chain === CHAIN.TESTNET
             )
-            const code = await getStorage(chatId).getItem("code");
-            
+            // const code = await getStorage(chatId).getItem("code");
+            await getStorage(chatId).setItem("walletAddress", walletAddress)
+
             await bot.sendMessage(chatId, `Кошелёк ${walletName} успешно подключён. Используйте команду /my_wallet, чтобы посмотреть его адрес`);
-            
-            console.log("подключен", walletAddress, code);
+            await handleSendWalletCommand(msg);
 
             unsubscribe();
             newConnectRequestListenersMap.delete(chatId);
@@ -84,6 +85,43 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
 
         newConnectRequestListenersMap.delete(chatId);
     });
+}
+
+export async function handleSendWalletCommand(msg: TelegramBot.Message): Promise<void> {
+    const chatId = msg.chat.id;
+    const storage = await getStorage(chatId);
+    const code = storage.getItem("code");
+    const walletAddress = storage.getItem("walletAddress")
+
+    // TODO: env var
+    axios.get(`http://localhost:5000?code=${code}&wallet=${walletAddress}`)
+        .then(async (response) => {
+            console.log(response.data)
+            await bot.sendMessage(chatId, `Данные кошелька успешно отправлены. NFT уже в пути!`, {
+                reply_markup: {
+                    remove_keyboard: true
+                }
+            });
+        })
+        .catch(async (error) => {
+            if (error.response.status === 401) {
+                await bot.sendMessage(chatId, `Этот адрес или код уже были использованы. Попробуйте воспользоваться другим`);
+            }
+
+            if (error.response.status === 500) {
+                await bot.sendMessage(chatId, `Произошла неизвестная ошибка при отправке адреса кошелька. Попробуйте отправить его чуть позже`, {
+                    reply_markup: {
+                        keyboard: [
+                            [
+                                {
+                                    text: "Отправить ещё раз"
+                                }
+                            ]
+                        ]
+                    }
+                });
+            }
+        });
 }
 
 export async function handleSendTXCommand(msg: TelegramBot.Message): Promise<void> {

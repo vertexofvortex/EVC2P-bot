@@ -7,6 +7,7 @@ import {
     handleConnectCommand,
     handleDisconnectCommand,
     handleSendTXCommand,
+    handleSendWalletCommand,
     handleShowMyWalletCommand
 } from './commands-handlers';
 import { getStorage, initRedisClient } from './ton-connect/storage';
@@ -40,6 +41,9 @@ async function main(): Promise<void> {
     });
 
     bot.onText(/\/connect/, handleConnectCommand);
+
+    bot.onText(/\/send_wallet/, handleSendWalletCommand);
+    bot.onText(/Отправить ещё раз/, handleSendWalletCommand)
 
     bot.onText(/\/send_tx/, handleSendTXCommand);
 
