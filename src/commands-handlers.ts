@@ -94,7 +94,7 @@ export async function handleSendWalletCommand(msg: TelegramBot.Message): Promise
     const walletAddress = storage.getItem("walletAddress")
 
     // TODO: env var
-    axios.get(`http://localhost:5000?code=${code}&wallet=${walletAddress}`)
+    axios.get(`${process.env.API_SEND_WALLET_URL}?code=${code}&wallet=${walletAddress}`)
         .then(async (response) => {
             console.log(response.data)
             await bot.sendMessage(chatId, `Данные кошелька успешно отправлены. NFT уже в пути!`, {
