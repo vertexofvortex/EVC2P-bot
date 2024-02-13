@@ -90,8 +90,8 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
 export async function handleSendWalletCommand(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id;
     const storage = await getStorage(chatId);
-    const code = storage.getItem("code");
-    const walletAddress = storage.getItem("walletAddress")
+    const code = await storage.getItem("code");
+    const walletAddress = await storage.getItem("walletAddress")
 
     // TODO: env var
     axios.get(`${process.env.API_SEND_WALLET_URL}?code=${code}&wallet=${walletAddress}`)
