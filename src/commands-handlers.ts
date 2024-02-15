@@ -16,8 +16,34 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
 
     newConnectRequestListenersMap.get(chatId)?.();
 
+    const deleteMessage = async (): Promise<void> => {
+        if (!messageWasDeleted) {
+            messageWasDeleted = true;
+            await bot.deleteMessage(chatId, botMessage.message_id);
+        }
+    };
+
     const connector = getConnector(chatId, () => {
-        unsubscribe();
+        connector.onStatusChange(async wallet => {
+            if (wallet) {
+                await deleteMessage();
+    
+                const walletName =
+                    (await getWalletInfo(wallet.device.appName))?.name || wallet.device.appName;
+                const walletAddress = toUserFriendlyAddress(
+                    connector.wallet!.account.address,
+                    connector.wallet!.account.chain === CHAIN.TESTNET
+                )
+                // const code = await getStorage(chatId).getItem("code");
+                await getStorage(chatId).setItem("walletAddress", walletAddress)
+    
+                await bot.sendMessage(chatId, `Кошелёк ${walletName} успешно подключен. Используйте команду /my_wallet, чтобы посмотреть его адрес`);
+                await handleSendWalletCommand(msg);
+    
+                unsubscribe();
+                newConnectRequestListenersMap.delete(chatId);
+            }
+        });
         newConnectRequestListenersMap.delete(chatId);
         deleteMessage();
     });
@@ -36,6 +62,29 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
         );
         return;
     }
+
+    // function unsubscribe(): void {
+    //     connector.onStatusChange(async wallet => {
+    //         if (wallet) {
+    //             await deleteMessage();
+    
+    //             const walletName =
+    //                 (await getWalletInfo(wallet.device.appName))?.name || wallet.device.appName;
+    //             const walletAddress = toUserFriendlyAddress(
+    //                 connector.wallet!.account.address,
+    //                 connector.wallet!.account.chain === CHAIN.TESTNET
+    //             )
+    //             // const code = await getStorage(chatId).getItem("code");
+    //             await getStorage(chatId).setItem("walletAddress", walletAddress)
+    
+    //             await bot.sendMessage(chatId, `Кошелёк ${walletName} успешно подключен. Используйте команду /my_wallet, чтобы посмотреть его адрес`);
+    //             await handleSendWalletCommand(msg);
+    
+    //             unsubscribe();
+    //             newConnectRequestListenersMap.delete(chatId);
+    //         }
+    //     });
+    // }
 
     const unsubscribe = connector.onStatusChange(async wallet => {
         if (wallet) {
@@ -71,12 +120,12 @@ export async function handleConnectCommand(msg: TelegramBot.Message): Promise<vo
         }
     });
 
-    const deleteMessage = async (): Promise<void> => {
-        if (!messageWasDeleted) {
-            messageWasDeleted = true;
-            await bot.deleteMessage(chatId, botMessage.message_id);
-        }
-    };
+    // async function deleteMessage(): Promise<void> {
+    //     if (!messageWasDeleted) {
+    //         messageWasDeleted = true;
+    //         await bot.deleteMessage(chatId, botMessage.message_id);
+    //     }
+    // }
 
     newConnectRequestListenersMap.set(chatId, async () => {
         unsubscribe();
